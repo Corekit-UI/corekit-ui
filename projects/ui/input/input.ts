@@ -8,6 +8,7 @@ import {
 } from '@angular/core'
 import { CkNativeValidator } from '@corekit/ui/reactive-forms'
 import { classNames } from '@corekit/ui/utils'
+import { CK_FORM_FIELD_INPUT } from './form-field-input'
 import { inputStyles } from './input.styles'
 
 @Component({
@@ -16,7 +17,10 @@ import { inputStyles } from './input.styles'
   standalone: true,
   template: '<ng-content />',
   hostDirectives: [CkNativeValidator],
-  host: { '[class]': '_class' },
+  providers: [{ provide: CK_FORM_FIELD_INPUT, useExisting: CkInput }],
+  // Marks the element for the styles that key off the presence of an input,
+  // e.g. the spacing of a label above it.
+  host: { ckFormFieldInput: '', '[class]': '_class' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CkInput {

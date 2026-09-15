@@ -99,7 +99,7 @@ export class CkMultiYearView<D> extends CkCalendarViewBase<D> {
     const activeDate = this.activeDate()
     const activeYear = this._dateAdapter.getYear(activeDate)
     const todayYear = this._dateAdapter.getYear(this._dateAdapter.today())
-    const selected = this.selected()
+    const selected = this._selectedDate()
 
     const selectedYear = selected ? this._dateAdapter.getYear(selected) : null
 

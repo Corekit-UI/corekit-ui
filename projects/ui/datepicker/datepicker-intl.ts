@@ -29,6 +29,12 @@ export class CkDatepickerIntl {
   /** Label of the next years page button in the multi-year view. */
   public nextMultiYearLabel = 'Go to the next 24 years'
 
+  /** Description of the day a selected range starts on. */
+  public startDateLabel = 'Start date'
+
+  /** Description of the day a selected range ends on. */
+  public endDateLabel = 'End date'
+
   /** Label of the datepicker toggle button. */
   public openCalendarLabel = 'Open calendar'
 

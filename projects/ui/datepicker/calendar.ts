@@ -18,6 +18,7 @@ import {
 } from '@corekit/ui/core'
 import { classNames } from '@corekit/ui/utils'
 import { CkCalendarHeader } from './calendar-header'
+import { CkDateRange } from './date-selection-model'
 import { calendarStyles } from './calendar.styles'
 import { CkDatepickerIntl } from './datepicker-intl'
 import { CkMonthView } from './month-view'
@@ -44,13 +45,14 @@ export class CkCalendar<D> {
   public readonly class = input<string>()
 
   /** The currently selected date. */
-  public readonly selected = model<D | null>(null)
+  public readonly selected = model<D | CkDateRange<D> | null>(null)
 
   /**
    * Event emitted when the user picks a date, even when it doesn't change the
-   * {@link selected `selected`} value.
+   * {@link selected `selected`} value. Emits `null` when the user abandons a
+   * range selection in progress.
    */
-  public readonly userSelection = output<D>()
+  public readonly userSelection = output<D | null>()
 
   /** The date the calendar is initially opened at. Defaults to today. */
   public readonly startAt = input<D | null>(null)
@@ -251,12 +253,24 @@ export class CkCalendar<D> {
 
   /** Selects the date and keeps the keyboard focus anchored to it. */
   protected _dateSelected(date: D): void {
-    if (!this._dateAdapter.sameDate(date, this.selected())) {
+    const selected = this.selected()
+
+    // A range is composed by whoever owns the selection — the calendar only
+    // reports the picked date and leaves the range alone.
+    if (
+      !(selected instanceof CkDateRange) &&
+      !this._dateAdapter.sameDate(date, selected)
+    ) {
       this.selected.set(date)
     }
 
     this._setActiveDate(date)
     this.userSelection.emit(date)
+  }
+
+  /** Reports a range selection the user has abandoned. */
+  protected _selectionCancelled(): void {
+    this.userSelection.emit(null)
   }
 
   /**

@@ -12,6 +12,7 @@ import {
 } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { CK_DATE_FORMATS, CkDateAdapter } from '@corekit/ui/core'
+import { CkDateRange } from './date-selection-model'
 
 /**
  * Base class of calendar views.
@@ -26,8 +27,8 @@ export abstract class CkCalendarViewBase<D> {
   /** The date defining the displayed period and the active (focusable) cell. */
   public readonly activeDate = input.required<D>()
 
-  /** The currently selected date. */
-  public readonly selected = input<D | null>(null)
+  /** The currently selected date or range. */
+  public readonly selected = input<D | CkDateRange<D> | null>(null)
 
   /** The minimum selectable date. */
   public readonly min = input<D | null>(null)
@@ -46,6 +47,19 @@ export abstract class CkCalendarViewBase<D> {
 
   protected readonly _dateAdapter = inject<CkDateAdapter<D>>(CkDateAdapter)
   protected readonly _dateFormats = inject(CK_DATE_FORMATS)
+
+  /**
+   * The single date the view highlights as selected. A range is represented
+   * by its start, falling back to its end — only the month view can render a
+   * range as a whole.
+   */
+  protected readonly _selectedDate = computed(() => {
+    const selected = this.selected()
+
+    if (!(selected instanceof CkDateRange)) return selected
+
+    return selected.start ?? selected.end
+  })
 
   /** Valid `min` boundary, `null` if absent or invalid. */
   protected readonly _min = computed(() => {

@@ -154,6 +154,139 @@
 </div>
 
 <div>
+  <h3>Date range picker</h3>
+
+  <p>
+    Two inputs share one frame, one popup and one set of boundaries. Pick the
+    start in the calendar, then the end — the popup closes once the range is
+    complete. Typing works too, and so does moving the caret between the halves
+    with the arrows or
+    <code>Backspace</code>
+    .
+  </p>
+
+  <form [formGroup]="rangeForm">
+    <ck-form-field class="max-w-96">
+      <label ckLabel for="range-start">
+        Choose a date range (July 5 – August 20)
+      </label>
+
+      <div class="relative flex items-center">
+        <ck-date-range-input
+          [rangePicker]="rangePicker"
+          [min]="minDate"
+          [max]="maxDate"
+        >
+          <input
+            id="range-start"
+            ckStartDate
+            formControlName="start"
+            placeholder="Start date"
+          />
+
+          <input ckEndDate formControlName="end" placeholder="End date" />
+        </ck-date-range-input>
+
+        <ck-datepicker-toggle ckInputSuffix [for]="rangePicker" />
+      </div>
+
+      @if (rangeForm.controls.start.errors?.['ckStartDateInvalid']) {
+        <ck-error>The range starts after it ends</ck-error>
+      } @else if (rangeForm.controls.end.errors?.['ckEndDateInvalid']) {
+        <ck-error>The range ends before it starts</ck-error>
+      } @else if (
+        rangeForm.controls.start.errors?.['ckDatepickerParse'] ||
+        rangeForm.controls.end.errors?.['ckDatepickerParse']
+      ) {
+        <ck-error>This doesn't look like a date</ck-error>
+      } @else if (
+        rangeForm.controls.start.errors?.['ckDatepickerMin'] ||
+        rangeForm.controls.end.errors?.['ckDatepickerMin']
+      ) {
+        <ck-error>The range starts before July 5</ck-error>
+      } @else if (
+        rangeForm.controls.start.errors?.['ckDatepickerMax'] ||
+        rangeForm.controls.end.errors?.['ckDatepickerMax']
+      ) {
+        <ck-error>The range ends after August 20</ck-error>
+      } @else if (
+        rangeForm.controls.start.errors?.['required'] ||
+        rangeForm.controls.end.errors?.['required']
+      ) {
+        <ck-error>Both ends of the range are required</ck-error>
+      }
+
+      <ck-date-range-picker #rangePicker />
+    </ck-form-field>
+  </form>
+
+  <div class="flex items-center gap-2">
+    <input
+      ckCheckbox
+      id="range-disabled"
+      type="checkbox"
+      [checked]="isRangeDisabled()"
+      (change)="toggleRangeDisabled()"
+    />
+
+    <label for="range-disabled">Disable the range</label>
+  </div>
+
+  <dl class="mt-4 space-y-1">
+    <div>
+      <dt class="inline font-medium">Value:</dt>
+      <dd class="inline">
+        <code>{{ rangeForm.value | json }}</code>
+      </dd>
+    </div>
+
+    <div>
+      <dt class="inline font-medium">Errors:</dt>
+      <dd class="inline">
+        <code>
+          {{ rangeForm.controls.start.errors | json }}
+          {{ rangeForm.controls.end.errors | json }}
+        </code>
+      </dd>
+    </div>
+  </dl>
+</div>
+
+<div>
+  <h3>Custom selection strategy</h3>
+
+  <p>
+    Provide
+    <code>CK_DATE_RANGE_SELECTION_STRATEGY</code>
+    to decide how the picked dates turn into a range and what the calendar
+    previews. This one hands out five days at a time — provided on the component
+    around the picker, so the pickers above keep the default behavior.
+  </p>
+
+  <app-five-day-range />
+</div>
+
+<div>
+  <h3>Date range in an inline calendar</h3>
+
+  <p>
+    The calendar reports every picked date and leaves composing the range to
+    whoever owns the selection — here it is the page itself, using the default
+    selection strategy. Hover or arrow around the grid after picking the first
+    day to see the range being previewed, and press
+    <code>Escape</code>
+    to abandon it.
+  </p>
+
+  <ck-calendar [selected]="range()" (userSelection)="pickRange($event)" />
+
+  <p class="mt-4">
+    Selected:
+    <code>{{ range().start }} – {{ range().end }}</code>
+  </p>
+</div>
+
+<div>
   <h3>Right-to-left</h3>
 
   <p>

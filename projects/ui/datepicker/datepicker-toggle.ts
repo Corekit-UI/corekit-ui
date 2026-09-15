@@ -11,7 +11,7 @@ import {
 } from '@angular/core'
 import { button } from '@corekit/ui/button'
 import { classNames } from '@corekit/ui/utils'
-import { CkDatepicker } from './datepicker'
+import { CkDatepickerPanel } from './datepicker-base'
 import { CkDatepickerIntl } from './datepicker-intl'
 
 /**
@@ -32,9 +32,9 @@ import { CkDatepickerIntl } from './datepicker-intl'
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'inline-flex' },
 })
-export class CkDatepickerToggle<D> implements OnDestroy {
+export class CkDatepickerToggle implements OnDestroy {
   /** The datepicker this toggle should control. */
-  public readonly for = input.required<CkDatepicker<D>>()
+  public readonly for = input.required<CkDatepickerPanel>()
 
   /** Whether the toggle is disabled on its own. */
   public readonly disabled = input(false, { transform: booleanAttribute })

@@ -21,6 +21,7 @@
       [weekdayStyle]="weekdayStyle()"
       (selectedChange)="_dateSelected($event)"
       (activeDateChange)="_setActiveDate($event)"
+      (selectionCancelled)="_selectionCancelled()"
     />
   }
   @case ('year') {

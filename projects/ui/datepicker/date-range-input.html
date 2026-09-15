@@ -1,0 +1,13 @@
+<div [class]="_wrapperClass">
+  <ng-content select="input[ckStartDate]" />
+
+  <span aria-hidden="true" [class]="_mirrorClass">{{ _startMirror() }}</span>
+</div>
+
+<span aria-hidden="true" [class]="_separatorClass">{{ separator() }}</span>
+
+<div [class]="_endWrapperClass">
+  <ng-content select="input[ckEndDate]" />
+
+  <span aria-hidden="true" [class]="_mirrorClass">{{ _endMirror() }}</span>
+</div>

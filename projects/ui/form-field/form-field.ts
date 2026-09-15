@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   contentChild,
+  contentChildren,
   DoCheck,
   effect,
   Injector,
@@ -13,7 +14,11 @@ import {
   signal,
 } from '@angular/core'
 import { FormGroupDirective, NgControl } from '@angular/forms'
-import { CkInput, CkInputPrefix, CkInputSuffix } from '@corekit/ui/input'
+import {
+  CK_FORM_FIELD_INPUT,
+  CkInputPrefix,
+  CkInputSuffix,
+} from '@corekit/ui/input'
 import { CkLabel } from '@corekit/ui/label'
 import { ErrorStateMatcher } from '@corekit/ui/reactive-forms'
 import { classNames } from '@corekit/ui/utils'
@@ -40,9 +45,14 @@ export class CkFormField implements DoCheck, AfterViewInit {
     )
   })
 
-  private readonly _ngControl = contentChild(NgControl)
+  // A field can hold more than one control, e.g. the two halves of a date
+  // range, and any of them can put it into the error state.
+  private readonly _ngControls = contentChildren(NgControl, {
+    descendants: true,
+  })
+
   private readonly _label = contentChild(CkLabel)
-  private readonly _input = contentChild(CkInput)
+  private readonly _input = contentChild(CK_FORM_FIELD_INPUT)
   private readonly _inputPrefix = contentChild(CkInputPrefix)
   private readonly _inputSuffix = contentChild(CkInputSuffix)
   private readonly _errorState = signal(false)
@@ -57,7 +67,7 @@ export class CkFormField implements DoCheck, AfterViewInit {
   public ngDoCheck(): void {
     // This has to be recalculated every time change detection runs due to a lot
     // of events that we want to react, but cannot subscribe to.
-    this._ngControl() && this._calculateErrorState()
+    this._ngControls().length && this._calculateErrorState()
   }
 
   public ngAfterViewInit(): void {
@@ -80,10 +90,10 @@ export class CkFormField implements DoCheck, AfterViewInit {
       this.errorStateMatcher() ?? this._defaultErrorStateMatcher
 
     const oldState = this._errorState()
-    const newState = errorStateMatcher.matches(
-      this._ngControl()!,
-      this._formGroupDirective,
-    )
+
+    const newState = this._ngControls().some(control => {
+      return errorStateMatcher.matches(control, this._formGroupDirective)
+    })
 
     if (newState !== oldState) this._errorState.set(newState)
   }

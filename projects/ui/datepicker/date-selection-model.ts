@@ -10,6 +10,26 @@ import {
 import { CkDateAdapter } from '@corekit/ui/core'
 import { Observable, Subject } from 'rxjs'
 
+/**
+ * Range of dates. Either end can be missing while the range is being picked.
+ */
+export class CkDateRange<D> {
+  /**
+   * Keeps objects that merely have `start` and `end` properties from being
+   * assigned to a range. A range is told apart from a single date by its type
+   * at runtime, so a structurally equivalent object would slip through.
+   */
+  private readonly _disableStructuralEquivalency!: never
+
+  constructor(
+    /** The start date of the range. */
+    public readonly start: D | null,
+
+    /** The end date of the range. */
+    public readonly end: D | null,
+  ) {}
+}
+
 /** Selection change notification. */
 export type CkDateSelectionChange<S> = {
   /** New selection value. */
@@ -27,7 +47,7 @@ export type CkDateSelectionChange<S> = {
  *
  * Both parties mutate and observe the same model, making it the single source
  * of truth for the selected value. `S` is the shape of the selection — a
- * single date now, a date range later, `D` is the date type.
+ * single date or a date range, `D` is the date type.
  */
 // Each datepicker provides its own model instance, hence no `providedIn`.
 // eslint-disable-next-line @angular-eslint/use-injectable-provided-in
@@ -64,28 +84,11 @@ export abstract class CkDateSelectionModel<S, D> implements OnDestroy {
   }
 
   /**
-   * Adds a date to the selection — sets it for a single date selection, will
-   * fill the next free slot for a range.
-   */
-  public abstract add(date: D | null, source: unknown): void
-
-  /**
    * Whether the selection is complete, e.g. both ends of a range are set.
+   * How a picked date turns into a selection is up to the datepicker, not to
+   * the model — a range, for one, is composed by a selection strategy.
    */
   public abstract isComplete(): boolean
-
-  /**
-   * Whether the selection is internally consistent. Selections made in the
-   * calendar always are, but programmatic ones can hold an invalid date or,
-   * for a range, an end preceding its start.
-   */
-  public abstract isValid(): boolean
-
-  protected _isValidDateInstance(date: D): boolean {
-    return (
-      this._dateAdapter.isDateInstance(date) && this._dateAdapter.isValid(date)
-    )
-  }
 }
 
 /** Selection model holding a single date. */
@@ -99,18 +102,8 @@ export class CkSingleDateSelectionModel<D> extends CkDateSelectionModel<
     super(null, inject<CkDateAdapter<D>>(CkDateAdapter))
   }
 
-  public add(date: D | null, source: unknown): void {
-    this.updateSelection(date, source)
-  }
-
   public isComplete(): boolean {
     return this.selection() !== null
-  }
-
-  public isValid(): boolean {
-    const selection = this.selection()
-
-    return selection !== null && this._isValidDateInstance(selection)
   }
 }
 
@@ -118,4 +111,31 @@ export class CkSingleDateSelectionModel<D> extends CkDateSelectionModel<
 export const CK_SINGLE_DATE_SELECTION_MODEL_PROVIDER: Provider = {
   provide: CkDateSelectionModel,
   useClass: CkSingleDateSelectionModel,
+}
+
+/** Selection model holding a date range. */
+// eslint-disable-next-line @angular-eslint/use-injectable-provided-in
+@Injectable()
+export class CkRangeDateSelectionModel<D> extends CkDateSelectionModel<
+  CkDateRange<D>,
+  D
+> {
+  constructor() {
+    super(
+      new CkDateRange<D>(null, null),
+      inject<CkDateAdapter<D>>(CkDateAdapter),
+    )
+  }
+
+  public isComplete(): boolean {
+    const { start, end } = this.selection()
+
+    return start !== null && end !== null
+  }
+}
+
+/** Provides a selection model holding a date range. */
+export const CK_RANGE_DATE_SELECTION_MODEL_PROVIDER: Provider = {
+  provide: CkDateSelectionModel,
+  useClass: CkRangeDateSelectionModel,
 }

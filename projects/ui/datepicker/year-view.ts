@@ -56,7 +56,7 @@ export class CkYearView<D> extends CkCalendarViewBase<D> {
     const year = this._dateAdapter.getYear(activeDate)
     const activeMonth = this._dateAdapter.getMonth(activeDate)
     const today = this._dateAdapter.today()
-    const selected = this.selected()
+    const selected = this._selectedDate()
     const monthNames = this._dateAdapter.getMonthNames('short')
 
     const cells = monthNames.map((name, month) => {

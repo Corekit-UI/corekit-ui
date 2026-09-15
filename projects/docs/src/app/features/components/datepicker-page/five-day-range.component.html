@@ -1,0 +1,22 @@
+<form [formGroup]="form">
+  <ck-form-field class="max-w-96">
+    <label ckLabel for="five-day-start">Choose a week of work</label>
+
+    <div class="relative flex items-center">
+      <ck-date-range-input [rangePicker]="picker">
+        <input
+          id="five-day-start"
+          ckStartDate
+          formControlName="start"
+          placeholder="First day"
+        />
+
+        <input ckEndDate formControlName="end" placeholder="Last day" />
+      </ck-date-range-input>
+
+      <ck-datepicker-toggle ckInputSuffix [for]="picker" />
+    </div>
+
+    <ck-date-range-picker #picker />
+  </ck-form-field>
+</form>

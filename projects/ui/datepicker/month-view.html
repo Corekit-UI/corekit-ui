@@ -13,25 +13,31 @@
     </tr>
   </thead>
 
-  <tbody>
+  <!-- Leaving the grid drops the preview, moving between the days rebuilds
+  it, so that it doesn't blink while the pointer crosses the cells. -->
+  <tbody (mouseleave)="_clearPreview()">
     @for (week of _weeks(); track $index) {
       <tr [class]="_weekRowClass">
         @for (cell of week; track $index) {
           <td
             role="gridcell"
             [attr.aria-selected]="cell ? cell.isSelected : null"
-            [class]="_cellClass"
+            [class]="cell ? cell.containerClass : _cellClass"
           >
             @if (cell) {
               <button
                 type="button"
-                [tabindex]="cell.isActive ? 0 : -1"
-                [attr.data-active]="cell.isActive || null"
+                [tabindex]="_isActive(cell) ? 0 : -1"
+                [attr.data-active]="_isActive(cell) || null"
                 [attr.aria-label]="cell.ariaLabel"
                 [attr.aria-disabled]="cell.isDisabled || null"
+                [attr.aria-describedby]="cell.describedBy"
                 [class]="cell.class"
                 (click)="_selectCell(cell)"
                 (keydown)="_handleKeydown($event)"
+                (mouseenter)="_previewChanged(cell)"
+                (focus)="_previewChanged(cell)"
+                (blur)="_clearPreview()"
               >
                 {{ cell.displayValue }}
               </button>
@@ -42,3 +48,8 @@
     }
   </tbody>
 </table>
+
+<!-- Described by the days at the ends of a selected range, so that a screen
+reader tells the two apart. -->
+<span class="sr-only" [id]="_startLabelId">{{ _intl.startDateLabel }}</span>
+<span class="sr-only" [id]="_endLabelId">{{ _intl.endDateLabel }}</span>

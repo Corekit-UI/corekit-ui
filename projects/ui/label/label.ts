@@ -9,7 +9,7 @@ const labelStyles = [
   'font-medium',
   'in-[.ck-invalid]:text-destructive',
   'inline-block',
-  'in-[ck-form-field:has([ckInput])]:mb-1',
+  'in-[ck-form-field:has([ckFormFieldInput])]:mb-1',
 ]
 
 @Directive({

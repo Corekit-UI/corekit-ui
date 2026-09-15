@@ -60,3 +60,58 @@ export const calendarViewCellStyles = cva(
     defaultVariants: { state: 'default', disabled: false },
   },
 )
+
+/**
+ * Band highlighting the days a range spans.
+ *
+ * Drawn by a pseudo element of the cell rather than by its background: it has
+ * to run through the space between the cells to read as one strip, and at the
+ * ends of the range it has to stop exactly where the day's own background
+ * begins, instead of peeking out from under it.
+ */
+export const calendarViewRangeStyles = cva(
+  [
+    'relative',
+    'before:absolute',
+    'before:content-[""]',
+    'before:inset-y-0',
+    'before:start-0',
+    'before:end-0',
+    'before:transition-colors',
+  ],
+  {
+    variants: {
+      /** Whether the day falls between the two ends of the selected range. */
+      inRange: { true: 'before:bg-primary/10', false: null },
+
+      /** Whether the day opens the selected range. */
+      rangeStart: { true: 'before:start-0.5 before:rounded-s-md', false: null },
+
+      /** Whether the day closes the selected range. */
+      rangeEnd: { true: 'before:end-0.5 before:rounded-e-md', false: null },
+
+      /**
+       * Whether the day falls into the range being previewed — the one that
+       * would be selected if the user picked the day they are pointing at.
+       */
+      inPreview: { true: 'before:bg-muted', false: null },
+
+      /** Whether the day opens the previewed range. */
+      previewStart: {
+        true: 'before:start-0.5 before:rounded-s-md',
+        false: null,
+      },
+
+      /** Whether the day closes the previewed range. */
+      previewEnd: { true: 'before:end-0.5 before:rounded-e-md', false: null },
+    },
+    defaultVariants: {
+      inRange: false,
+      rangeStart: false,
+      rangeEnd: false,
+      inPreview: false,
+      previewStart: false,
+      previewEnd: false,
+    },
+  },
+)

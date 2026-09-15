@@ -71,3 +71,39 @@ export function dateFilterValidator<D>(
     return { ckDatepickerFilter: true }
   }
 }
+
+/**
+ * Fails with `ckStartDateInvalid` when the start of a range comes after its
+ * end.
+ */
+export function startDateValidator<D>(
+  dateAdapter: CkDateAdapter<D>,
+  getEnd: () => D | null,
+): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const start = toDate(dateAdapter, control)
+    const end = dateAdapter.getValidDateOrNull(getEnd())
+
+    if (!start || !end || dateAdapter.compareDate(start, end) <= 0) return null
+
+    return { ckStartDateInvalid: { end, actual: start } }
+  }
+}
+
+/**
+ * Fails with `ckEndDateInvalid` when the end of a range comes before its
+ * start.
+ */
+export function endDateValidator<D>(
+  dateAdapter: CkDateAdapter<D>,
+  getStart: () => D | null,
+): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const end = toDate(dateAdapter, control)
+    const start = dateAdapter.getValidDateOrNull(getStart())
+
+    if (!end || !start || dateAdapter.compareDate(end, start) >= 0) return null
+
+    return { ckEndDateInvalid: { start, actual: end } }
+  }
+}
