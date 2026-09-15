@@ -29,10 +29,8 @@ import {
   viewChild,
   ViewContainerRef,
 } from '@angular/core'
-import { CkDateNameStyle } from '@corekit/ui/core'
 import { classNames } from '@corekit/ui/utils'
 import { Subject } from 'rxjs'
-import { CkCalendarView } from './calendar'
 import { CkDateSelectionModel } from './date-selection-model'
 import { CkDatepickerControl } from './datepicker-control'
 import { datepickerPanelStyles } from './datepicker.styles'
@@ -76,16 +74,14 @@ export abstract class CkDatepickerBase<C extends CkDatepickerControl<D>, S, D>
   implements OnDestroy
 {
   /**
-   * The date the calendar is opened at. Defaults to the selected date or
-   * today.
+   * The date the popup opens at, e.g. the month a calendar shows. Defaults to
+   * the picked date, and to today when nothing is picked.
+   *
+   * It outranks a picked date, so that a calendar can be opened away from it.
+   * A popup that cannot show a value without pointing at it puts the picked
+   * one first instead, the way the timepicker does.
    */
   public readonly startAt = input<D | null>(null)
-
-  /** The view the calendar is opened at. */
-  public readonly startView = input<CkCalendarView>('month')
-
-  /** Style of the weekday names in the month view header row. */
-  public readonly weekdayStyle = input<CkDateNameStyle>('short')
 
   /** Whether the datepicker is disabled on its own. */
   public readonly disabled = input(false, { transform: booleanAttribute })
@@ -139,14 +135,9 @@ export abstract class CkDatepickerBase<C extends CkDatepickerControl<D>, S, D>
    */
   protected readonly _startAtOnOpen = signal<D | null>(null)
 
-  // Boundaries and the filter belong to the control, as they also drive its
-  // validation.
+  // Boundaries belong to the control, as they also drive its validation.
   protected readonly _min = computed(() => this._input()?.min() ?? null)
   protected readonly _max = computed(() => this._input()?.max() ?? null)
-
-  protected readonly _dateFilter = computed(() => {
-    return this._input()?.dateFilter() ?? null
-  })
 
   protected readonly _class = computed(() => {
     return classNames(
@@ -198,7 +189,7 @@ export abstract class CkDatepickerBase<C extends CkDatepickerControl<D>, S, D>
       new TemplatePortal(this._template(), this._viewContainerRef),
     )
 
-    this._focusActiveCellAfterRender()
+    this._focusActiveElementAfterRender()
   }
 
   /** Closes the popup. */
@@ -261,13 +252,16 @@ export abstract class CkDatepickerBase<C extends CkDatepickerControl<D>, S, D>
     this._overlayRef = null
   }
 
-  /** Focuses the active day of the calendar once the popup is rendered. */
-  private _focusActiveCellAfterRender(): void {
+  /**
+   * Focuses whatever the panel marks as active once it is rendered, e.g. the
+   * active day of a calendar.
+   */
+  private _focusActiveElementAfterRender(): void {
     afterNextRender(
       {
         read: () => {
           this._overlayRef?.overlayElement
-            .querySelector<HTMLButtonElement>('button[data-active]')
+            .querySelector<HTMLElement>('[data-active]')
             ?.focus()
         },
       },

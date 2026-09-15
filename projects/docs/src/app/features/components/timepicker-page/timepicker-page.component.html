@@ -1,0 +1,241 @@
+<h2>Timepicker</h2>
+
+<p>
+  An input for a time of day, with a popup to pick it in. The value is a date
+  carrying the picked time: typing moves the time of the day the value already
+  points at, leaving that day alone.
+</p>
+
+<p>
+  Turning the columns of the popup only moves the time it is showing. Nothing
+  reaches the value until
+  <code>Set</code>
+  keeps it, and
+  <code>Cancel</code>
+  leaves it as it was.
+</p>
+
+<div>
+  <h3>Basic</h3>
+
+  <p>
+    Type a time the way the locale writes it, e.g.
+    <code>2:30 PM</code>
+    or
+    <code>14:30</code>
+    . A bare hour is a time of its own, so
+    <code>9</code>
+    reads as nine in the morning.
+  </p>
+
+  <ck-form-field class="max-w-72">
+    <label ckLabel for="time">Choose a time</label>
+
+    <div class="relative flex items-center">
+      <input
+        id="time"
+        ckInput
+        placeholder="Pick a time"
+        [ckTimepicker]="picker"
+      />
+
+      <ck-timepicker-toggle ckInputSuffix [for]="picker" />
+    </div>
+
+    <ck-timepicker #picker />
+  </ck-form-field>
+</div>
+
+<div>
+  <h3>Reactive form, boundaries and validation</h3>
+
+  <p>
+    <code>min</code>
+    and
+    <code>max</code>
+    compare the time alone, so the day they fall on is of no consequence. The
+    columns of the popup list only what they leave within reach.
+  </p>
+
+  <form [formGroup]="form">
+    <ck-form-field class="max-w-72">
+      <label ckLabel for="form-time">Choose a time (9:00 AM – 5:30 PM)</label>
+
+      <div class="relative flex items-center">
+        <input
+          id="form-time"
+          ckInput
+          placeholder="Pick a time"
+          formControlName="time"
+          [ckTimepicker]="formPicker"
+          [min]="minTime"
+          [max]="maxTime"
+        />
+
+        <ck-timepicker-toggle ckInputSuffix [for]="formPicker" />
+      </div>
+
+      <!-- An unparsable value is also an empty one, so the errors are shown by
+      priority: the most specific one wins. -->
+      @if (form.controls.time.errors?.['ckTimepickerParse']) {
+        <ck-error>This doesn't look like a time</ck-error>
+      } @else if (form.controls.time.errors?.['ckTimepickerMin']) {
+        <ck-error>The time is before 9:00 AM</ck-error>
+      } @else if (form.controls.time.errors?.['ckTimepickerMax']) {
+        <ck-error>The time is after 5:30 PM</ck-error>
+      } @else if (form.controls.time.errors?.['required']) {
+        <ck-error>This field is required</ck-error>
+      }
+
+      <ck-timepicker #formPicker />
+    </ck-form-field>
+  </form>
+
+  <div class="flex items-center gap-2">
+    <input
+      ckCheckbox
+      id="time-disabled"
+      type="checkbox"
+      [checked]="isFormDisabled()"
+      (change)="toggleFormDisabled()"
+    />
+
+    <label for="time-disabled">Disable the form control</label>
+  </div>
+
+  <dl class="mt-4 space-y-1">
+    <div>
+      <dt class="inline font-medium">Value:</dt>
+      <dd class="inline">
+        <code>{{ form.controls.time.value }}</code>
+      </dd>
+    </div>
+
+    <div>
+      <dt class="inline font-medium">Errors:</dt>
+      <dd class="inline">
+        <code>{{ form.controls.time.errors | json }}</code>
+      </dd>
+    </div>
+  </dl>
+</div>
+
+<div>
+  <h3>Time selector</h3>
+
+  <p>
+    The columns of the popup, on their own. The clock comes from the locale,
+    which decides both how the hours are numbered and whether there is a day
+    period column at all.
+  </p>
+
+  <div class="bg-surface w-fit rounded-lg border p-3">
+    <ck-time-selector [(value)]="selectorTime" />
+  </div>
+
+  <p class="mt-4">
+    Picked:
+    <code>{{ selectorTime() }}</code>
+  </p>
+</div>
+
+<div>
+  <h3>Forcing a clock</h3>
+
+  <p>
+    Pass
+    <code>hourFormat</code>
+    to lay the columns out on a 12-hour or a 24-hour clock whatever the locale
+    keeps time on.
+  </p>
+
+  <div class="flex flex-wrap gap-6">
+    <div class="bg-surface w-fit rounded-lg border p-3">
+      <ck-time-selector hourFormat="12h" [(value)]="clockTime" />
+    </div>
+
+    <div class="bg-surface w-fit rounded-lg border p-3">
+      <ck-time-selector hourFormat="24h" [(value)]="clockTime" />
+    </div>
+  </div>
+
+  <p class="mt-4">
+    Picked:
+    <code>{{ clockTime() }}</code>
+  </p>
+</div>
+
+<div>
+  <h3>Boundaries in the columns</h3>
+
+  <p>
+    A column lists only what is within reach. An hour stays on the list while
+    any of its minutes is within the boundaries, and a half of the day while any
+    of its hours is, so the minute column grows and shrinks as the hour at
+    either end of the range is picked.
+  </p>
+
+  <p>
+    Stepping past a boundary pulls the time back to it, which is what happens
+    when an hour only lets some of its minutes through.
+  </p>
+
+  <div class="bg-surface w-fit rounded-lg border p-3">
+    <ck-time-selector [min]="minTime" [max]="maxTime" [(value)]="boundedTime" />
+  </div>
+
+  <p class="mt-4">
+    Picked:
+    <code>{{ boundedTime() }}</code>
+  </p>
+</div>
+
+<div>
+  <h3>Opening time</h3>
+
+  <p>
+    A popup opened with nothing picked has to start somewhere, and the current
+    time is where it starts. Pass
+    <code>startAt</code>
+    to open it somewhere else, and project any content into the toggle to
+    replace its clock.
+  </p>
+
+  <ck-form-field class="max-w-72">
+    <label ckLabel for="appointment">Appointment</label>
+
+    <div class="relative flex items-center">
+      <input
+        id="appointment"
+        ckInput
+        placeholder="Pick a time"
+        [ckTimepicker]="appointmentPicker"
+      />
+
+      <ck-timepicker-toggle ckInputSuffix [for]="appointmentPicker">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 22h14" />
+          <path d="M5 2h14" />
+          <path
+            d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"
+          />
+          <path
+            d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"
+          />
+        </svg>
+      </ck-timepicker-toggle>
+    </div>
+
+    <ck-timepicker #appointmentPicker [startAt]="openAt" />
+  </ck-form-field>
+</div>

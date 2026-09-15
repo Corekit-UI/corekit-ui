@@ -1,0 +1,36 @@
+<ng-template #template>
+  <div
+    cdkTrapFocus
+    role="dialog"
+    aria-modal="false"
+    [id]="id"
+    [attr.aria-label]="_intl.chooseTimeLabel"
+    [class]="_class()"
+    (animationend)="_animationEnd($event)"
+  >
+    <div [class]="_panelClass">
+      <ck-time-selector
+        [hourFormat]="hourFormat()"
+        [min]="_min()"
+        [max]="_max()"
+        [(value)]="_pending"
+      />
+
+      <div [class]="_footerClass">
+        <button
+          ckButton
+          type="button"
+          size="sm"
+          appearance="ghost"
+          (click)="close()"
+        >
+          {{ _intl.cancelLabel }}
+        </button>
+
+        <button ckButton type="button" size="sm" (click)="_apply()">
+          {{ _intl.setLabel }}
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

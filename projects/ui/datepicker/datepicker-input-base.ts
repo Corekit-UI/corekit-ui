@@ -193,16 +193,13 @@ export abstract class CkDatepickerInputBase<S, D>
   /** Parses the typed value and puts it into the selection. */
   protected _handleInput(event: Event): void {
     const text = _getEventTarget<HTMLInputElement>(event)?.value ?? ''
-    const parsed = this._dateAdapter.parse(
-      text,
-      this._dateFormats.parse.dateInput,
-    )
+    const parsed = this._parseValue(text)
 
     // An empty field is not a parse error, a value that isn't a date is.
     this._isParseValid.set(!parsed || this._dateAdapter.isValid(parsed))
 
     const date = this._dateAdapter.getValidDateOrNull(parsed)
-    const hasChanged = !this._dateAdapter.sameDate(date, this.value())
+    const hasChanged = !this._sameValue(date, this.value())
 
     // Every null is reported to the form, even when the value stays null:
     // typing an unparsable date doesn't change the value, but it does change
@@ -233,6 +230,22 @@ export abstract class CkDatepickerInputBase<S, D>
 
     this._openPopup()
     event.preventDefault()
+  }
+
+  /**
+   * Reads the typed text into a value of the input, e.g. a date. Subclasses
+   * holding something else, e.g. a time, read it their own way.
+   */
+  protected _parseValue(text: string): D | null {
+    return this._dateAdapter.parse(text, this._dateFormats.parse.dateInput)
+  }
+
+  /**
+   * Whether two values of the input are the same one, which is what tells a
+   * real change from a reformatted value.
+   */
+  protected _sameValue(first: D | null, second: D | null): boolean {
+    return this._dateAdapter.sameDate(first, second)
   }
 
   /** Validators every date input runs. */
@@ -333,7 +346,7 @@ export abstract class CkDatepickerInputBase<S, D>
     this._onChange(date)
     this._onTouched()
 
-    if (this._dateAdapter.sameDate(date, oldDate)) return
+    if (this._sameValue(date, oldDate)) return
 
     this.dateInput.emit(date)
     this.dateChange.emit(date)

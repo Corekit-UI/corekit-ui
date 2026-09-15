@@ -45,6 +45,10 @@ export const COMPONENTS_MENU_RAW: MenuItem[] = [
     link: `${COMPONENTS_PATHS.root}/${COMPONENTS_PATHS.datepicker}`,
   },
   {
+    title: 'Timepicker',
+    link: `${COMPONENTS_PATHS.root}/${COMPONENTS_PATHS.timepicker}`,
+  },
+  {
     title: 'Dialog',
     link: `${COMPONENTS_PATHS.root}/${COMPONENTS_PATHS.dialog}`,
   },

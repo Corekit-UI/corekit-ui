@@ -1,0 +1,45 @@
+<div aria-hidden="true" [class]="_bandClass"></div>
+
+<!-- The headers are there to be seen. A screen reader hears the same text as
+the name of each column, and would otherwise read it twice in a row. -->
+<div [class]="_columnClass">
+  <span aria-hidden="true" [class]="_headerClass">{{ _intl.hourLabel }}</span>
+
+  <ck-time-list
+    active
+    [label]="_intl.hourLabel"
+    [options]="_hourOptions()"
+    [value]="_hour()"
+    (valueChange)="_hourChanged($event)"
+  />
+</div>
+
+<div aria-hidden="true" [class]="_separatorColumnClass">
+  <span [class]="_separatorClass">:</span>
+</div>
+
+<div [class]="_columnClass">
+  <span aria-hidden="true" [class]="_headerClass">{{ _intl.minuteLabel }}</span>
+
+  <ck-time-list
+    [label]="_intl.minuteLabel"
+    [options]="_minuteOptions()"
+    [value]="_minute()"
+    (valueChange)="_minuteChanged($event)"
+  />
+</div>
+
+@if (_hourFormat() === '12h') {
+  <div [class]="_dayPeriodColumnClass">
+    <span aria-hidden="true" [class]="_headerClass">
+      {{ _intl.dayPeriodLabel }}
+    </span>
+
+    <ck-time-list
+      [label]="_intl.dayPeriodLabel"
+      [options]="_dayPeriodOptions()"
+      [value]="_dayPeriod()"
+      (valueChange)="_dayPeriodChanged($event)"
+    />
+  </div>
+}

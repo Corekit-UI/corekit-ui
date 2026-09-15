@@ -8,7 +8,10 @@ import {
 } from '@angular/core'
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators } from '@angular/forms'
 import { CkDatepickerBase } from './datepicker-base'
-import { CkDatepickerControl } from './datepicker-control'
+import {
+  CkCalendarDatepickerControl,
+  CkDatepickerControl,
+} from './datepicker-control'
 import { CkDatepickerInputBase } from './datepicker-input-base'
 
 const CONTROL_VALUE_ACCESSOR_PROVIDER = {
@@ -47,7 +50,7 @@ const VALIDATOR_PROVIDER = {
 })
 export class CkDatepickerInput<D>
   extends CkDatepickerInputBase<D | null, D>
-  implements OnInit, OnDestroy, CkDatepickerControl<D>
+  implements OnInit, OnDestroy, CkCalendarDatepickerControl<D>
 {
   /** The datepicker this input should control. */
   public readonly datepicker = input.required<

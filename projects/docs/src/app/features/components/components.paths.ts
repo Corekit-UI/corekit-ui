@@ -16,4 +16,5 @@ export const COMPONENTS_PATHS = {
   label: 'label',
   radio: 'radio',
   table: 'table',
+  timepicker: 'timepicker',
 }

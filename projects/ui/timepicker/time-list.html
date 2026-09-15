@@ -1,0 +1,30 @@
+<div
+  #scroller
+  role="listbox"
+  tabindex="0"
+  [attr.aria-label]="label()"
+  [attr.data-active]="active() || null"
+  [attr.aria-activedescendant]="_activeOptionId()"
+  [class]="_scrollerClass"
+  (scroll)="_handleScroll()"
+  (keydown)="_handleKeydown($event)"
+>
+  <!-- The column is one listbox: it keeps the focus and the keys, and points
+  a screen reader at the picked option with `aria-activedescendant`, so the
+  options are deliberately not focusable on their own. -->
+  <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+  <!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+  @for (option of _renderedOptions(); track option.value) {
+    <div
+      role="option"
+      [id]="option.id"
+      [attr.aria-selected]="option.isSelected"
+      [class]="option.class"
+      (click)="_select(option.value)"
+    >
+      {{ option.label }}
+    </div>
+  }
+  <!-- eslint-enable @angular-eslint/template/click-events-have-key-events -->
+  <!-- eslint-enable @angular-eslint/template/interactive-supports-focus -->
+</div>
