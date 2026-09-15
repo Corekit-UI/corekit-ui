@@ -81,6 +81,12 @@ export class CkTimepickerInput<D>
   protected readonly _minDate = this.min
   protected readonly _maxDate = this.max
 
+  // TODO: The input base still asks every input for a day filter and runs
+  // date validators unless told otherwise — hence this stub, and the
+  // validators replaced wholesale below. Move the filter, the date validators
+  // and the date defaults into a base for the inputs showing a calendar. Best
+  // done along with the datetime picker: its input needs the filter but reads
+  // and compares date and time together, which settles what the bases share.
   /** A time falls on no day of its own, so there is nothing to filter. */
   protected readonly _dateFilter = signal<((date: D) => boolean) | null>(null)
 
