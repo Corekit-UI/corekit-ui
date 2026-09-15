@@ -25,7 +25,10 @@ import {
 } from './date-range-input.styles'
 import { CkDateRange, CkDateSelectionModel } from './date-selection-model'
 import { CkDatepickerBase } from './datepicker-base'
-import { CkDatepickerControl } from './datepicker-control'
+import {
+  CkCalendarDatepickerControl,
+  CkDatepickerControl,
+} from './datepicker-control'
 
 /**
  * Group of two inputs holding the ends of a date range.
@@ -60,7 +63,11 @@ import { CkDatepickerControl } from './datepicker-control'
   },
 })
 export class CkDateRangeInput<D>
-  implements OnInit, OnDestroy, CkDatepickerControl<D>, CkFormFieldInput
+  implements
+    OnInit,
+    OnDestroy,
+    CkCalendarDatepickerControl<D>,
+    CkFormFieldInput
 {
   /** The range picker this group should control. */
   public readonly rangePicker =

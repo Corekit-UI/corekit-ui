@@ -6,14 +6,20 @@ import { InjectionToken } from '@angular/core'
  * The shape of each format is defined by the `CkDateAdapter` implementation in
  * use, e.g. `Intl.DateTimeFormatOptions` for the `CkNativeDateAdapter`.
  */
-export interface CkDateFormats {
+export type CkDateFormats = {
   parse: {
     /** Format of the dates typed into an input. */
     dateInput: unknown
+
+    /** Format of the times typed into an input. */
+    timeInput: unknown
   }
   display: {
     /** Format of the date displayed in an input. */
     dateInput: unknown
+
+    /** Format of the time displayed in an input. */
+    timeInput: unknown
 
     /** Format of the month and year label in the calendar header. */
     monthYearLabel: unknown

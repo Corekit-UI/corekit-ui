@@ -2,11 +2,13 @@ import { CdkTrapFocus } from '@angular/cdk/a11y'
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
+  input,
   Provider,
 } from '@angular/core'
-import { CkDateAdapter } from '@corekit/ui/core'
-import { CkCalendar } from './calendar'
+import { CkDateAdapter, CkDateNameStyle } from '@corekit/ui/core'
+import { CkCalendar, CkCalendarView } from './calendar'
 import {
   CK_DATE_RANGE_SELECTION_STRATEGY,
   CkDateRangeSelectionStrategy,
@@ -17,7 +19,7 @@ import {
   CkDateRange,
 } from './date-selection-model'
 import { CkDatepickerBase } from './datepicker-base'
-import { CkDatepickerControl } from './datepicker-control'
+import { CkCalendarDatepickerControl } from './datepicker-control'
 
 /**
  * Provides the default selection strategy, unless the consumer has already
@@ -51,10 +53,24 @@ const RANGE_SELECTION_STRATEGY_PROVIDER: Provider = {
   host: { class: 'hidden' },
 })
 export class CkDateRangePicker<D> extends CkDatepickerBase<
-  CkDatepickerControl<D>,
+  CkCalendarDatepickerControl<D>,
   CkDateRange<D>,
   D
 > {
+  /** The view the calendar is opened at. */
+  public readonly startView = input<CkCalendarView>('month')
+
+  /** Style of the weekday names in the month view header row. */
+  public readonly weekdayStyle = input<CkDateNameStyle>('short')
+
+  /**
+   * Days the calendar turns down, e.g. weekends. Belongs to the control, as
+   * it also drives its validation.
+   */
+  protected readonly _dateFilter = computed(() => {
+    return this._input()?.dateFilter() ?? null
+  })
+
   private readonly _rangeStrategy = inject<CkDateRangeSelectionStrategy<D>>(
     CK_DATE_RANGE_SELECTION_STRATEGY,
   )
